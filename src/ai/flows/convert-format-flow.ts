@@ -36,6 +36,7 @@ export async function convertFormat(input: ConvertFormatInput): Promise<ConvertF
         throw new Error("Failed to convert to YAML: " + e.message);
     }
   }
+  // For XML and TOML, we will use the AI flow.
   return convertFormatFlow(input);
 }
 
