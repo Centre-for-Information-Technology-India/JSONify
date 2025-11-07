@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import type { ChangeEvent } from "react";
-import { WrapText, Minimize, ShieldCheck, Wand2, CheckCircle, XCircle, Wrench } from "lucide-react";
+import { WrapText, Minimize, ShieldCheck, Wand2, CheckCircle, XCircle, Wrench, ListTree } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -11,9 +11,12 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { explainJsonError, type ExplainJsonErrorOutput } from "@/ai/flows/explain-json-error";
 import { useToast } from "@/hooks/use-toast";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { JsonTreeView } from "./JsonTreeView";
 
 
 type ValidationStatus = "idle" | "success" | "error";
+type JsonView = "raw" | "tree";
 
 const initialJson = `{
   "name": "JSONify",
@@ -31,17 +34,25 @@ const initialJson = `{
 
 export function JsonTool() {
   const [jsonString, setJsonString] = useState<string>(initialJson);
+  const [parsedJson, setParsedJson] = useState<any>(JSON.parse(initialJson));
   const [validationStatus, setValidationStatus] = useState<ValidationStatus>("idle");
   const [validationMessage, setValidationMessage] = useState<string>("");
   const [aiExplanation, setAiExplanation] = useState<ExplainJsonErrorOutput | null>(null);
   const [isAIExplanationLoading, setIsAIExplanationLoading] = useState<boolean>(false);
+  const [activeView, setActiveView] = useState<JsonView>("raw");
   const { toast } = useToast();
 
   const handleJsonChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
-    setJsonString(e.target.value);
+    const newJsonString = e.target.value;
+    setJsonString(newJsonString);
     if (validationStatus !== "idle") {
       setValidationStatus("idle");
       setAiExplanation(null);
+    }
+    try {
+        setParsedJson(JSON.parse(newJsonString));
+    } catch {
+        // Ignore parsing errors while typing
     }
   };
 
@@ -53,7 +64,9 @@ export function JsonTool() {
     }
     try {
       const parsed = JSON.parse(jsonString);
-      setJsonString(JSON.stringify(parsed, null, 2));
+      const formattedJson = JSON.stringify(parsed, null, 2);
+      setJsonString(formattedJson);
+      setParsedJson(parsed);
       setValidationStatus("success");
       setValidationMessage("JSON formatted successfully.");
       setAiExplanation(null);
@@ -74,7 +87,9 @@ export function JsonTool() {
     }
     try {
       const parsed = JSON.parse(jsonString);
-      setJsonString(JSON.stringify(parsed));
+      const minifiedJson = JSON.stringify(parsed);
+      setJsonString(minifiedJson);
+      setParsedJson(parsed);
       setValidationStatus("success");
       setValidationMessage("JSON minified successfully.");
       setAiExplanation(null);
@@ -94,7 +109,8 @@ export function JsonTool() {
         return;
     }
     try {
-      JSON.parse(jsonString);
+      const parsed = JSON.parse(jsonString);
+      setParsedJson(parsed);
       setValidationStatus("success");
       setValidationMessage("JSON is valid!");
       setAiExplanation(null);
@@ -131,7 +147,13 @@ export function JsonTool() {
 
   const handleApplyFix = () => {
     if (aiExplanation?.suggestedFix) {
-      setJsonString(aiExplanation.suggestedFix);
+      const fixedJsonString = aiExplanation.suggestedFix;
+      setJsonString(fixedJsonString);
+      try {
+        setParsedJson(JSON.parse(fixedJsonString));
+      } catch {
+        // If the fix is still invalid, we'll catch it on next validation
+      }
       setValidationStatus("idle");
       setAiExplanation(null);
       toast({
@@ -150,11 +172,11 @@ export function JsonTool() {
             <CardDescription>Paste your JSON code below.</CardDescription>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <Button variant="outline" size="sm" onClick={handleFormat} disabled={!jsonString}>
+            <Button variant="outline" size="sm" onClick={handleFormat} disabled={!jsonString || activeView === 'tree'}>
               <WrapText className="mr-2 h-4 w-4" />
               Format
             </Button>
-            <Button variant="outline" size="sm" onClick={handleMinify} disabled={!jsonString}>
+            <Button variant="outline" size="sm" onClick={handleMinify} disabled={!jsonString || activeView === 'tree'}>
               <Minimize className="mr-2 h-4 w-4" />
               Minify
             </Button>
@@ -164,14 +186,29 @@ export function JsonTool() {
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="flex-grow">
-          <Textarea
-            value={jsonString}
-            onChange={handleJsonChange}
-            placeholder="Enter your JSON here..."
-            className="w-full h-[60vh] font-code text-sm resize-none bg-background"
-            aria-label="JSON Input"
-          />
+        <CardContent className="flex-grow flex flex-col">
+           <Tabs value={activeView} onValueChange={(value) => setActiveView(value as JsonView)} className="flex-grow flex flex-col">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="raw">
+                <WrapText className="mr-2 h-4 w-4" /> Raw
+              </TabsTrigger>
+              <TabsTrigger value="tree" disabled={validationStatus === 'error'}>
+                <ListTree className="mr-2 h-4 w-4" /> Tree View
+              </TabsTrigger>
+            </TabsList>
+            <TabsContent value="raw" className="flex-grow mt-4">
+              <Textarea
+                value={jsonString}
+                onChange={handleJsonChange}
+                placeholder="Enter your JSON here..."
+                className="w-full h-[60vh] font-code text-sm resize-none bg-background"
+                aria-label="JSON Input"
+              />
+            </TabsContent>
+            <TabsContent value="tree" className="flex-grow mt-4 overflow-auto h-[60vh]">
+              <JsonTreeView data={parsedJson} />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
 
