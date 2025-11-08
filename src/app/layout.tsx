@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 export const metadata: Metadata = {
   title: 'JSONify',
   description: 'A developer utility app to format, validate, and minify JSON.',
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
@@ -18,6 +19,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Source+Code+Pro&display=swap" rel="stylesheet" />
+        <meta name="theme-color" content="#121212" />
       </head>
       <body className="font-body antialiased bg-background">
         {children}
