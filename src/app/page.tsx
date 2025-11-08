@@ -3,7 +3,6 @@ import { JsonConverter } from '@/components/json/JsonConverter';
 import { JsonSecurityTool } from '@/components/json/JsonSecurityTool';
 import { JsonPerformanceAnalyzer } from '@/components/json/JsonPerformanceAnalyzer';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { AppLayoutHeader } from "@/components/layout/AppLayoutHeader";
 import { AppLayoutSidebar } from "@/components/layout/AppLayoutSidebar";
 import { AppLayoutMain } from "@/components/layout/AppLayoutMain";
 import { FileJson, Shield, Gauge } from 'lucide-react';
@@ -35,9 +34,9 @@ export default function Home() {
         </div>
       </AppLayoutSidebar>
       <AppLayoutMain>
-        <AppLayoutHeader>
+        <div data-layout="header">
           <Header />
-        </AppLayoutHeader>
+        </div>
         <JsonTool />
       </AppLayoutMain>
     </AppLayout>
