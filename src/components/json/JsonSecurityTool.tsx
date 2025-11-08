@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useContext } from "react";
-import { ShieldAlert, ShieldCheck, Wand2, Eye, EyeOff, Check } from "lucide-react";
+import { ShieldAlert, ShieldCheck, Wand2, Eye, EyeOff, Check, Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -109,14 +109,20 @@ export function JsonSecurityTool() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Secure Mode</CardTitle>
+    <Card className="flex flex-col h-full border-border/40">
+      <CardHeader className="pb-3 space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-primary/10 rounded">
+            <Shield className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <CardTitle className="text-sm font-semibold">Security</CardTitle>
+        </div>
+        <CardDescription className="text-xs text-muted-foreground">Detect sensitive data with AI</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
-        <Button onClick={handleScan} disabled={isLoading || jsonContext?.validationStatus !== 'success'} className="w-full">
-            <Wand2 className={`mr-2 h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-            {isLoading ? "Scanning..." : "Scan with AI"}
+      <CardContent className="space-y-3 pb-3 flex-grow">
+        <Button onClick={handleScan} disabled={isLoading || jsonContext?.validationStatus !== 'success'} className="w-full h-8" size="sm">
+            <Wand2 className={`mr-1.5 h-3.5 w-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <span className="text-xs">{isLoading ? "Scanning..." : "Scan with AI"}</span>
         </Button>
         {isLoading && (
             <div className="space-y-2">

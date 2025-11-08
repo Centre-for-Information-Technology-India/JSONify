@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useContext, useEffect } from "react";
-import { Copy, RefreshCw } from "lucide-react";
+import { Copy, RefreshCw, FileJson } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -86,39 +86,45 @@ export function JsonConverter() {
       <Textarea
         readOnly
         value={convertedCode}
-        className="w-full h-full font-code text-sm resize-none bg-muted/20 border-0 focus-visible:ring-0"
+        className="w-full h-full font-code text-xs md:text-sm resize-none bg-muted/20 border-0 focus-visible:ring-0"
         placeholder={`Converted ${activeTab.toUpperCase()} will appear here...`}
       />
     );
   };
   
   return (
-    <Card className="h-full flex flex-col">
-      <CardHeader>
+    <Card className="flex flex-col h-full border-border/40">
+      <CardHeader className="pb-3 space-y-2">
         <div className="flex items-center justify-between">
-            <CardTitle className="text-base">Converter</CardTitle>
-            <div className="flex gap-2">
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleConversion(activeTab)} disabled={isLoading || jsonContext?.validationStatus !== 'success'}>
-                    <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-primary/10 rounded">
+                <FileJson className="h-3.5 w-3.5 text-primary" />
+              </div>
+              <CardTitle className="text-sm font-semibold">Converter</CardTitle>
+            </div>
+            <div className="flex gap-1">
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleConversion(activeTab)} disabled={isLoading || jsonContext?.validationStatus !== 'success'} title="Refresh">
+                    <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCopyToClipboard} disabled={!convertedCode || isLoading}>
-                    <Copy className="h-4 w-4" />
+                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCopyToClipboard} disabled={!convertedCode || isLoading} title="Copy">
+                    <Copy className="h-3 w-3" />
                 </Button>
             </div>
         </div>
+        <CardDescription className="text-xs text-muted-foreground">Convert to YAML, XML, or TOML</CardDescription>
       </CardHeader>
-      <CardContent className="flex-grow flex flex-col">
+      <CardContent className="flex-grow flex flex-col pb-3 min-h-0">
         <Tabs
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as Format)}
-          className="flex-grow flex flex-col"
+          className="flex-grow flex flex-col min-h-0"
         >
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="yaml">YAML</TabsTrigger>
-            <TabsTrigger value="xml">XML</TabsTrigger>
-            <TabsTrigger value="toml">TOML</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-8 mb-2">
+            <TabsTrigger value="yaml" className="text-xs">YAML</TabsTrigger>
+            <TabsTrigger value="xml" className="text-xs">XML</TabsTrigger>
+            <TabsTrigger value="toml" className="text-xs">TOML</TabsTrigger>
           </TabsList>
-          <div className="flex-grow mt-4 rounded-md bg-muted/30 border data-[status=invalid]:flex data-[status=invalid]:items-center data-[status=invalid]:justify-center" data-status={jsonContext?.validationStatus !== 'success' ? 'invalid' : 'valid'}>
+          <div className="flex-grow rounded-md bg-muted/30 border border-border/40 data-[status=invalid]:flex data-[status=invalid]:items-center data-[status=invalid]:justify-center min-h-[200px]" data-status={jsonContext?.validationStatus !== 'success' ? 'invalid' : 'valid'}>
             {renderContent()}
           </div>
         </Tabs>

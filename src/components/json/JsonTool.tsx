@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, createContext } from "react";
+import { useState, createContext, useRef } from "react";
 import type { ChangeEvent } from "react";
-import { WrapText, Minimize, ShieldCheck, Wand2, CheckCircle, XCircle, Wrench, ListTree } from "lucide-react";
+import { WrapText, Minimize, ShieldCheck, Wand2, CheckCircle, XCircle, Wrench, ListTree, Upload } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -78,8 +78,51 @@ export function JsonTool() {
     }
   };
 
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const handleJsonChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setJsonString(e.target.value);
+  };
+
+  const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.endsWith('.json')) {
+      toast({
+        variant: "destructive",
+        title: "Invalid File Type",
+        description: "Please upload a .json file.",
+      });
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const content = event.target?.result as string;
+      setJsonString(content);
+      toast({
+        title: "File Loaded",
+        description: `${file.name} has been loaded successfully.`,
+      });
+    };
+    reader.onerror = () => {
+      toast({
+        variant: "destructive",
+        title: "Upload Failed",
+        description: "Could not read the file. Please try again.",
+      });
+    };
+    reader.readAsText(file);
+    
+    // Reset input so same file can be uploaded again
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
   const handleFormat = () => {
@@ -176,50 +219,82 @@ export function JsonTool() {
 
   return (
     <JsonContext.Provider value={{ jsonString, parsedJson, validationStatus, setJsonString }}>
-      <div className="flex flex-col gap-6 h-full p-4 md:p-6 lg:p-8">
-        <Card className="flex-grow flex flex-col">
-          <CardHeader className="flex-col md:flex-row items-start md:items-center justify-between gap-4">
-              <div>
-              <CardTitle>JSON Input</CardTitle>
-              <CardDescription>Paste your JSON code below. It will be validated automatically.</CardDescription>
+      <div className="flex flex-col gap-4">
+        {/* Toolbar */}
+        <Card className="border-border/40">
+          <CardContent className="p-3 md:p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
+                  <div className={`w-2.5 h-2.5 rounded-full ${validationStatus === 'success' ? 'bg-green-500' : validationStatus === 'error' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                  <span className="text-xs md:text-sm font-medium text-muted-foreground">
+                    {validationStatus === 'success' ? 'Valid JSON' : validationStatus === 'error' ? 'Invalid JSON' : 'Ready'}
+                  </span>
+                </div>
+                <div className="h-4 w-px bg-border mx-2" />
+                <span className="text-xs text-muted-foreground">
+                  {jsonString.length.toLocaleString()} characters
+                </span>
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-              <Button variant="outline" size="sm" onClick={handleFormat} disabled={!jsonString || activeView === 'tree'}>
-                  <WrapText className="mr-2 h-4 w-4" />
-                  Format
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleMinify} disabled={!jsonString || activeView === 'tree'}>
-                  <Minimize className="mr-2 h-4 w-4" />
-                  Minify
-              </Button>
-              <Button size="sm" onClick={handleValidate} disabled={!jsonString}>
-                  <ShieldCheck className="mr-2 h-4 w-4" />
-                  Validate
-              </Button>
+              
+              <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".json"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                  aria-label="Upload JSON file"
+                />
+                <Button variant="outline" size="sm" onClick={handleUploadClick} className="flex-1 sm:flex-none h-8">
+                    <Upload className="mr-1.5 h-3.5 w-3.5" />
+                    <span className="text-xs">Upload</span>
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleFormat} disabled={!jsonString || activeView === 'tree'} className="flex-1 sm:flex-none h-8">
+                    <WrapText className="mr-1.5 h-3.5 w-3.5" />
+                    <span className="text-xs">Format</span>
+                </Button>
+                <Button variant="outline" size="sm" onClick={handleMinify} disabled={!jsonString || activeView === 'tree'} className="flex-1 sm:flex-none h-8">
+                    <Minimize className="mr-1.5 h-3.5 w-3.5" />
+                    <span className="text-xs">Minify</span>
+                </Button>
+                <Button size="sm" onClick={handleValidate} disabled={!jsonString} className="flex-1 sm:flex-none h-8">
+                    <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
+                    <span className="text-xs">Validate</span>
+                </Button>
               </div>
-          </CardHeader>
-          <CardContent className="flex-grow flex flex-col">
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Editor */}
+        <Card className="flex flex-col border-border/40 shadow-lg">
+          <CardContent className="p-0 flex-grow flex flex-col">
               <Tabs value={activeView} onValueChange={(value) => setActiveView(value as JsonView)} className="flex-grow flex flex-col">
-              <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="raw">
-                  <WrapText className="mr-2 h-4 w-4" /> Raw
-                  </TabsTrigger>
-                  <TabsTrigger value="tree" disabled={validationStatus === 'error'}>
-                  <ListTree className="mr-2 h-4 w-4" /> Tree View
-                  </TabsTrigger>
-              </TabsList>
-              <TabsContent value="raw" className="flex-grow mt-4">
-                  <Textarea
-                  value={jsonString}
-                  onChange={handleJsonChange}
-                  placeholder="Enter your JSON here..."
-                  className="w-full h-full font-code text-sm resize-none bg-background"
-                  aria-label="JSON Input"
-                  />
-              </TabsContent>
-              <TabsContent value="tree" className="flex-grow mt-4 h-full">
-                  <JsonTreeView data={parsedJson} />
-              </TabsContent>
+                <div className="border-b border-border/40 bg-muted/30 px-4 py-2">
+                  <TabsList className="h-8 bg-background/50">
+                      <TabsTrigger value="raw" className="text-xs data-[state=active]:bg-background">
+                        <WrapText className="mr-1.5 h-3.5 w-3.5" /> Editor
+                      </TabsTrigger>
+                      <TabsTrigger value="tree" disabled={validationStatus === 'error'} className="text-xs data-[state=active]:bg-background">
+                        <ListTree className="mr-1.5 h-3.5 w-3.5" /> Tree View
+                      </TabsTrigger>
+                  </TabsList>
+                </div>
+                
+                <TabsContent value="raw" className="mt-0 data-[state=active]:block h-[600px]">
+                    <Textarea
+                      value={jsonString}
+                      onChange={handleJsonChange}
+                      placeholder="Paste your JSON here or upload a file..."
+                      className="w-full h-full font-code text-sm leading-relaxed resize-none bg-muted/20 border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 p-4 md:p-6"
+                      aria-label="JSON Input"
+                      spellCheck={false}
+                    />
+                </TabsContent>
+                <TabsContent value="tree" className="mt-0 overflow-auto p-4 md:p-6 bg-muted/20 h-[600px]">
+                    <JsonTreeView data={parsedJson} />
+                </TabsContent>
               </Tabs>
           </CardContent>
         </Card>
@@ -227,69 +302,69 @@ export function JsonTool() {
         {validationStatus === "success" && (
             <Alert variant="default" className="border-green-500/50 text-green-500">
                 <CheckCircle className="h-4 w-4 !text-green-500" />
-                <AlertTitle>JSON is valid!</AlertTitle>
-                <AlertDescription>No syntax errors detected.</AlertDescription>
+                <AlertTitle className="text-sm md:text-base">JSON is valid!</AlertTitle>
+                <AlertDescription className="text-xs md:text-sm">No syntax errors detected.</AlertDescription>
             </Alert>
         )}
 
         {validationStatus === "error" && (
-        <Alert variant="destructive">
-            <XCircle className="h-4 w-4" />
-            <AlertTitle>Validation Error</AlertTitle>
-            <AlertDescription className="font-code break-words">{validationMessage}</AlertDescription>
-            <div className="mt-4">
-            <Button onClick={handleExplainError} disabled={isAIExplanationLoading}>
-                <Wand2 className="mr-2 h-4 w-4" />
-                {isAIExplanationLoading ? "Thinking..." : "Explain with AI"}
-            </Button>
-            </div>
-        </Alert>
+          <Alert variant="destructive">
+              <XCircle className="h-4 w-4" />
+              <AlertTitle className="text-sm md:text-base">Validation Error</AlertTitle>
+              <AlertDescription className="font-code break-words text-xs md:text-sm">{validationMessage}</AlertDescription>
+              <div className="mt-3">
+                <Button onClick={handleExplainError} disabled={isAIExplanationLoading} size="sm">
+                    <Wand2 className="mr-1.5 h-4 w-4" />
+                    <span className="text-xs md:text-sm">{isAIExplanationLoading ? "Thinking..." : "Explain with AI"}</span>
+                </Button>
+              </div>
+          </Alert>
         )}
 
         {isAIExplanationLoading && (
-        <Card>
-            <CardHeader>
-            <CardTitle>AI Explanation</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-            <Skeleton className="h-4 w-1/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-            <div className="pt-4 space-y-2">
-                <Skeleton className="h-4 w-1/3" />
+          <Card>
+              <CardHeader>
+                <CardTitle className="text-base md:text-lg">AI Explanation</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-4 w-1/4" />
                 <Skeleton className="h-4 w-full" />
-            </div>
-            </CardContent>
-        </Card>
+                <Skeleton className="h-4 w-3/4" />
+                <div className="pt-4 space-y-2">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-4 w-full" />
+                </div>
+              </CardContent>
+          </Card>
         )}
 
         {aiExplanation && !isAIExplanationLoading && (
-        <Card className="bg-primary/5 border-primary/20">
-            <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-primary">
-                <Wand2 className="h-5 w-5" />
-                AI-Powered Explanation
-            </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-            <div>
-                <h3 className="font-semibold text-foreground mb-2">The Problem</h3>
-                <p className="text-sm text-muted-foreground">{aiExplanation.explanation}</p>
-            </div>
-            <div>
-                <h3 className="font-semibold text-foreground mb-2">Suggested Fix</h3>
-                <div className="font-code bg-muted p-3 rounded-md break-words text-sm text-muted-foreground">
-                <pre><code>{aiExplanation.suggestedFix}</code></pre>
+          <Card className="bg-primary/5 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-primary text-base md:text-lg">
+                    <Wand2 className="h-4 w-4 md:h-5 md:w-5" />
+                    AI-Powered Explanation
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                    <h3 className="font-semibold text-foreground mb-2 text-sm md:text-base">The Problem</h3>
+                    <p className="text-xs md:text-sm text-muted-foreground">{aiExplanation.explanation}</p>
                 </div>
-            </div>
-            <div className="pt-2">
-                <Button onClick={handleApplyFix} size="sm">
-                <Wrench className="mr-2 h-4 w-4" />
-                Apply Fix
-                </Button>
-            </div>
-            </CardContent>
-        </Card>
+                <div>
+                    <h3 className="font-semibold text-foreground mb-2 text-sm md:text-base">Suggested Fix</h3>
+                    <div className="font-code bg-muted p-3 rounded-md break-words text-xs md:text-sm text-muted-foreground overflow-x-auto">
+                      <pre><code>{aiExplanation.suggestedFix}</code></pre>
+                    </div>
+                </div>
+                <div className="pt-2">
+                    <Button onClick={handleApplyFix} size="sm">
+                      <Wrench className="mr-1.5 h-4 w-4" />
+                      <span className="text-xs md:text-sm">Apply Fix</span>
+                    </Button>
+                </div>
+              </CardContent>
+          </Card>
         )}
     </div>
   </JsonContext.Provider>

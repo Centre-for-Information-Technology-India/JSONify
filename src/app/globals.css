@@ -70,3 +70,50 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Improve scrollbar styling for webkit browsers */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    @apply bg-border/80;
+  }
+  
+  /* Better mobile touch targets */
+  @media (max-width: 768px) {
+    button, a, [role="button"] {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+}
+
+/* Code editor enhancements */
+textarea.font-code {
+  tab-size: 2;
+  -moz-tab-size: 2;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+textarea.font-code::placeholder {
+  @apply text-muted-foreground/50;
+}
+
+/* Line numbers effect (visual only) */
+textarea.font-code {
+  background-image: linear-gradient(transparent 50%, rgba(255, 255, 255, 0.02) 50%);
+  background-size: 100% 3.2em;
+  background-position: 0 0.2em;
+}

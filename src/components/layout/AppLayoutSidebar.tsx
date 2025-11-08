@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/ui/sidebar"
 const AppLayoutSidebar = React.forwardRef<
   React.ElementRef<typeof Sidebar>,
   React.ComponentProps<typeof Sidebar>
->(({ className, side = "right", ...props }, ref) => {
+>(({ className, side = "left", ...props }, ref) => {
   return (
     <Sidebar
       ref={ref}

@@ -1,6 +1,26 @@
-# Allow all user-agents to crawl the site
+# robots.txt for JSONify
+# https://jsonify.cit.org.in
+
 User-agent: *
 Allow: /
 
-# Point crawlers to the sitemap
+# Disallow admin or private areas (if any in future)
+# Disallow: /admin/
+# Disallow: /api/private/
+
+# Sitemap location
 Sitemap: https://jsonify.cit.org.in/sitemap.xml
+
+# Crawl-delay for specific bots (optional)
+User-agent: Googlebot
+Crawl-delay: 0
+
+User-agent: Bingbot
+Crawl-delay: 0
+
+# Block bad bots (optional)
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10

@@ -1,7 +1,7 @@
 "use client";
 
 import { useContext, useMemo } from "react";
-import { Zap, GaugeCircle, FileText } from "lucide-react";
+import { Zap, GaugeCircle, FileText, Gauge } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { JsonContext } from "./JsonTool";
 
@@ -76,11 +76,17 @@ export function JsonPerformanceAnalyzer() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-base">Analyzer</CardTitle>
+    <Card className="flex flex-col h-full border-border/40">
+      <CardHeader className="pb-3 space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 bg-primary/10 rounded">
+            <Gauge className="h-3.5 w-3.5 text-primary" />
+          </div>
+          <CardTitle className="text-sm font-semibold">Performance</CardTitle>
+        </div>
+        <CardDescription className="text-xs text-muted-foreground">Analyze size and optimization</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pb-3 flex-grow">
         {renderContent()}
       </CardContent>
     </Card>
