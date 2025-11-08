@@ -1,74 +1,11 @@
-
 "use client"
 
 import * as React from "react"
-import {
-  Sidebar,
-  SidebarProvider,
-  SidebarInset,
-} from "@/components/ui/sidebar"
-
-type AppLayoutContext = {}
-const AppLayoutContext = React.createContext<AppLayoutContext | null>(null)
+import { SidebarProvider } from "@/components/ui/sidebar"
 
 type AppLayoutProps = React.ComponentProps<typeof SidebarProvider>
-function AppLayout({ children, ...props }: AppLayoutProps) {
-  const contextValue = React.useMemo<AppLayoutContext>(() => ({}), [])
-
+export function AppLayout({ children, ...props }: AppLayoutProps) {
   return (
-    <AppLayoutContext.Provider value={contextValue}>
-      <SidebarProvider {...props}>{children}</SidebarProvider>
-    </AppLayoutContext.Provider>
+    <SidebarProvider {...props}>{children}</SidebarProvider>
   )
 }
-
-const AppLayoutHeader = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div">
->(({ className, ...props }, ref) => {
-  return (
-    <div
-      ref={ref}
-      className={className}
-      data-layout="header"
-      {...props}
-    />
-  )
-})
-AppLayoutHeader.displayName = "AppLayoutHeader"
-
-const AppLayoutMain = React.forwardRef<
-  HTMLDivElement,
-  React.ComponentProps<"div">
->(({ ...props }, ref) => {
-  return (
-    <SidebarInset
-      ref={ref}
-      data-layout="main"
-      {...props}
-    />
-  )
-})
-AppLayoutMain.displayName = "AppLayoutMain"
-
-const AppLayoutSidebar = React.forwardRef<
-  React.ElementRef<typeof Sidebar>,
-  React.ComponentProps<typeof Sidebar>
->(({ className, side = "right", ...props }, ref) => {
-  return (
-    <Sidebar
-      ref={ref}
-      data-layout="sidebar"
-      side={side}
-      className={className}
-      {...props}
-    />
-  )
-})
-AppLayoutSidebar.displayName = "AppLayoutSidebar"
-
-AppLayout.Header = AppLayoutHeader;
-AppLayout.Main = AppLayoutMain;
-AppLayout.Sidebar = AppLayoutSidebar;
-
-export { AppLayout };

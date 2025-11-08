@@ -3,6 +3,9 @@ import { JsonConverter } from '@/components/json/JsonConverter';
 import { JsonSecurityTool } from '@/components/json/JsonSecurityTool';
 import { JsonPerformanceAnalyzer } from '@/components/json/JsonPerformanceAnalyzer';
 import { AppLayout } from '@/components/layout/AppLayout';
+import { AppLayoutHeader } from "@/components/layout/AppLayoutHeader";
+import { AppLayoutSidebar } from "@/components/layout/AppLayoutSidebar";
+import { AppLayoutMain } from "@/components/layout/AppLayoutMain";
 import { FileJson, Shield, Gauge } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Header } from '@/components/layout/Header';
@@ -10,11 +13,11 @@ import { Header } from '@/components/layout/Header';
 export default function Home() {
   return (
     <AppLayout>
-      <AppLayout.Header>
+      <AppLayoutHeader>
         <Header />
-      </AppLayout.Header>
+      </AppLayoutHeader>
       
-      <AppLayout.Sidebar>
+      <AppLayoutSidebar>
         <div className="flex flex-col h-full p-4 gap-6">
           <div className="flex items-center gap-2">
             <FileJson className="h-5 w-5 text-primary" />
@@ -34,11 +37,11 @@ export default function Home() {
           </div>
           <JsonPerformanceAnalyzer />
         </div>
-      </AppLayout.Sidebar>
+      </AppLayoutSidebar>
 
-      <AppLayout.Main>
+      <AppLayoutMain>
         <JsonTool />
-      </AppLayout.Main>
+      </AppLayoutMain>
     </AppLayout>
   );
 }
