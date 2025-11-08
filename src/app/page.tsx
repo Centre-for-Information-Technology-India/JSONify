@@ -3,7 +3,7 @@ import { JsonConverter } from '@/components/json/JsonConverter';
 import { JsonSecurityTool } from '@/components/json/JsonSecurityTool';
 import { JsonPerformanceAnalyzer } from '@/components/json/JsonPerformanceAnalyzer';
 import { AppLayout } from '@/components/layout/AppLayout';
-import { FileJson, Shield, Gauge, GitCommitHorizontal } from 'lucide-react';
+import { FileJson, Shield, Gauge } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Header } from '@/components/layout/Header';
 
