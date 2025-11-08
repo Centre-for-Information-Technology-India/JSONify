@@ -15,6 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { JsonTreeView } from "./JsonTreeView";
 import { JsonConverter } from "./JsonConverter";
 import { JsonSecurityTool } from "./JsonSecurityTool";
+import { JsonPerformanceAnalyzer } from "./JsonPerformanceAnalyzer";
 
 type ValidationStatus = "idle" | "success" | "error";
 type JsonView = "raw" | "tree";
@@ -290,6 +291,7 @@ export function JsonTool() {
         <div className="lg:col-span-1 flex flex-col gap-6">
             <JsonConverter />
             <JsonSecurityTool />
+            <JsonPerformanceAnalyzer />
         </div>
       </div>
     </JsonContext.Provider>
