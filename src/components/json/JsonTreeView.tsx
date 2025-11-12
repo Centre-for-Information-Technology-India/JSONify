@@ -131,14 +131,23 @@ const JsonNode = ({
   }
 
   return (
-    <div className={cn("font-code text-sm")}>
+    <div className={cn("font-code text-sm")} role="treeitem" aria-expanded={isObjectOrArray ? isExpanded : undefined}>
       <div
         className={cn(
-          "flex items-center space-x-1 py-1 rounded",
+          "flex items-center space-x-1 py-1 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
           isObjectOrArray && "cursor-pointer hover:bg-muted/50"
         )}
         onClick={toggleExpand}
+        onKeyDown={(e) => {
+          if (isObjectOrArray && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            toggleExpand();
+          }
+        }}
         style={{ paddingLeft: `${level * 1.25}rem` }}
+        tabIndex={isObjectOrArray ? 0 : -1}
+        role={isObjectOrArray ? "button" : undefined}
+        aria-label={isObjectOrArray ? `${nodeKey}: ${type} with ${itemCount} ${type === 'array' ? 'items' : 'keys'}. ${isExpanded ? 'Expanded' : 'Collapsed'}. Press Enter or Space to ${isExpanded ? 'collapse' : 'expand'}` : `${nodeKey}: ${type} value`}
       >
         {isObjectOrArray ? (
             <ChevronRight
@@ -146,11 +155,12 @@ const JsonNode = ({
                     "h-4 w-4 mr-1 shrink-0 transition-transform duration-200",
                     isExpanded && "rotate-90"
                 )}
+                aria-hidden="true"
             />
         ) : (
-            <GripVertical className="h-4 w-4 mr-1 invisible" /> 
+            <GripVertical className="h-4 w-4 mr-1 invisible" aria-hidden="true" /> 
         )}
-        <span className="mr-1">{getIcon(type)}</span>
+        <span className="mr-1" aria-hidden="true">{getIcon(type)}</span>
         <span className="text-primary/80"><Highlight text={nodeKey} highlight={searchTerm} />:</span>
         
         {!isObjectOrArray && (
@@ -159,14 +169,14 @@ const JsonNode = ({
           </span>
         )}
         {isObjectOrArray && (
-          <span className="ml-2 text-muted-foreground text-xs">
+          <span className="ml-2 text-muted-foreground text-xs" aria-hidden="true">
             {isExpanded ? '' : type === 'array' ? `[${itemCount} items]` : `{${itemCount} keys}` }
           </span>
         )}
       </div>
 
       {isExpanded && isObjectOrArray && (
-        <div className="border-l border-primary/10">
+        <div className="border-l border-primary/10" role="group">
           {filteredItems.map(([key, value]) => (
             <JsonNode key={key} nodeKey={key} nodeValue={value} level={level + 1} searchTerm={searchTerm} isInitiallyExpanded={!!searchTerm} />
           ))}
@@ -234,8 +244,10 @@ export function JsonTreeView({ data }: { data: JsonValue }) {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full"
+            aria-label="Search JSON tree by key or value"
+            type="search"
         />
-        <div className="overflow-auto flex-grow">
+        <div className="overflow-auto flex-grow scrollbar-thin" role="tree" aria-label="JSON tree structure">
             {Object.entries(filteredData).map(([key, value]) => (
                 <JsonNode key={key} nodeKey={key} nodeValue={value} level={0} searchTerm={searchTerm} isInitiallyExpanded={!!searchTerm || searchTerm.length === 0} />
             ))}
