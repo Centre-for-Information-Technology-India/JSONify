@@ -225,19 +225,22 @@ export function JsonTool() {
           <CardContent className="p-3 md:p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5">
-                  <div className={`w-2.5 h-2.5 rounded-full ${validationStatus === 'success' ? 'bg-green-500' : validationStatus === 'error' ? 'bg-red-500' : 'bg-yellow-500'}`} />
+                <div className="flex items-center gap-1.5" id="json-status" role="status" aria-live="polite">
+                  <div 
+                    className={`w-2.5 h-2.5 rounded-full ${validationStatus === 'success' ? 'bg-green-500' : validationStatus === 'error' ? 'bg-red-500' : 'bg-yellow-500'}`}
+                    aria-hidden="true"
+                  />
                   <span className="text-xs md:text-sm font-medium text-muted-foreground">
                     {validationStatus === 'success' ? 'Valid JSON' : validationStatus === 'error' ? 'Invalid JSON' : 'Ready'}
                   </span>
                 </div>
-                <div className="h-4 w-px bg-border mx-2" />
-                <span className="text-xs text-muted-foreground">
+                <div className="h-4 w-px bg-border mx-2" aria-hidden="true" />
+                <span className="text-xs text-muted-foreground" aria-label={`${jsonString.length} characters`}>
                   {jsonString.length.toLocaleString()} characters
                 </span>
               </div>
               
-              <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+              <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto" role="toolbar" aria-label="JSON editor actions">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -245,21 +248,48 @@ export function JsonTool() {
                   onChange={handleFileUpload}
                   className="hidden"
                   aria-label="Upload JSON file"
+                  id="json-file-upload"
                 />
-                <Button variant="outline" size="sm" onClick={handleUploadClick} className="flex-1 sm:flex-none h-8">
-                    <Upload className="mr-1.5 h-3.5 w-3.5" />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleUploadClick} 
+                  className="flex-1 sm:flex-none min-h-[44px] md:min-h-[32px]"
+                  aria-label="Upload JSON file"
+                >
+                    <Upload className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
                     <span className="text-xs">Upload</span>
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleFormat} disabled={!jsonString || activeView === 'tree'} className="flex-1 sm:flex-none h-8">
-                    <WrapText className="mr-1.5 h-3.5 w-3.5" />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleFormat} 
+                  disabled={!jsonString || activeView === 'tree'} 
+                  className="flex-1 sm:flex-none min-h-[44px] md:min-h-[32px]"
+                  aria-label="Format JSON with proper indentation"
+                >
+                    <WrapText className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
                     <span className="text-xs">Format</span>
                 </Button>
-                <Button variant="outline" size="sm" onClick={handleMinify} disabled={!jsonString || activeView === 'tree'} className="flex-1 sm:flex-none h-8">
-                    <Minimize className="mr-1.5 h-3.5 w-3.5" />
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleMinify} 
+                  disabled={!jsonString || activeView === 'tree'} 
+                  className="flex-1 sm:flex-none min-h-[44px] md:min-h-[32px]"
+                  aria-label="Minify JSON by removing whitespace"
+                >
+                    <Minimize className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
                     <span className="text-xs">Minify</span>
                 </Button>
-                <Button size="sm" onClick={handleValidate} disabled={!jsonString} className="flex-1 sm:flex-none h-8">
-                    <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
+                <Button 
+                  size="sm" 
+                  onClick={handleValidate} 
+                  disabled={!jsonString} 
+                  className="flex-1 sm:flex-none min-h-[44px] md:min-h-[32px]"
+                  aria-label="Validate JSON syntax"
+                >
+                    <ShieldCheck className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" />
                     <span className="text-xs">Validate</span>
                 </Button>
               </div>
@@ -268,31 +298,39 @@ export function JsonTool() {
         </Card>
 
         {/* Editor */}
-        <Card className="flex flex-col border-border/40 shadow-lg">
-          <CardContent className="p-0 flex-grow flex flex-col">
-              <Tabs value={activeView} onValueChange={(value) => setActiveView(value as JsonView)} className="flex-grow flex flex-col">
+        <Card className="border-border/40 shadow-lg">
+          <CardContent className="p-0">
+              <Tabs value={activeView} onValueChange={(value) => setActiveView(value as JsonView)}>
                 <div className="border-b border-border/40 bg-muted/30 px-4 py-2">
-                  <TabsList className="h-8 bg-background/50">
-                      <TabsTrigger value="raw" className="text-xs data-[state=active]:bg-background">
-                        <WrapText className="mr-1.5 h-3.5 w-3.5" /> Editor
+                  <TabsList className="h-9 bg-background/50" aria-label="JSON view options">
+                      <TabsTrigger value="raw" className="text-xs data-[state=active]:bg-background min-h-[44px] md:min-h-0">
+                        <WrapText className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" /> 
+                        <span>Editor</span>
                       </TabsTrigger>
-                      <TabsTrigger value="tree" disabled={validationStatus === 'error'} className="text-xs data-[state=active]:bg-background">
-                        <ListTree className="mr-1.5 h-3.5 w-3.5" /> Tree View
+                      <TabsTrigger 
+                        value="tree" 
+                        disabled={validationStatus === 'error'} 
+                        className="text-xs data-[state=active]:bg-background min-h-[44px] md:min-h-0"
+                        aria-label={validationStatus === 'error' ? 'Tree view disabled - fix JSON errors first' : 'Tree view'}
+                      >
+                        <ListTree className="mr-1.5 h-3.5 w-3.5" aria-hidden="true" /> 
+                        <span>Tree View</span>
                       </TabsTrigger>
                   </TabsList>
                 </div>
                 
-                <TabsContent value="raw" className="mt-0 data-[state=active]:block h-[600px]">
+                <TabsContent value="raw" className="mt-0">
                     <Textarea
                       value={jsonString}
                       onChange={handleJsonChange}
                       placeholder="Paste your JSON here or upload a file..."
-                      className="w-full h-full font-code text-sm leading-relaxed resize-none bg-muted/20 border-0 rounded-none focus-visible:ring-0 focus-visible:ring-offset-0 p-4 md:p-6"
-                      aria-label="JSON Input"
+                      className="w-full h-[500px] font-code text-sm leading-relaxed resize-none bg-muted/20 border-0 rounded-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-0 p-4 md:p-6 scrollbar-thin"
+                      aria-label="JSON input editor"
+                      aria-describedby="json-status"
                       spellCheck={false}
                     />
                 </TabsContent>
-                <TabsContent value="tree" className="mt-0 overflow-auto p-4 md:p-6 bg-muted/20 h-[600px]">
+                <TabsContent value="tree" className="mt-0 h-[500px] overflow-auto p-4 md:p-6 bg-muted/20 scrollbar-thin" role="region" aria-label="JSON tree view">
                     <JsonTreeView data={parsedJson} />
                 </TabsContent>
               </Tabs>
@@ -300,21 +338,27 @@ export function JsonTool() {
         </Card>
 
         {validationStatus === "success" && (
-            <Alert variant="default" className="border-green-500/50 text-green-500">
-                <CheckCircle className="h-4 w-4 !text-green-500" />
+            <Alert variant="default" className="border-green-500/50 text-green-500" role="status" aria-live="polite">
+                <CheckCircle className="h-4 w-4 !text-green-500" aria-hidden="true" />
                 <AlertTitle className="text-sm md:text-base">JSON is valid!</AlertTitle>
                 <AlertDescription className="text-xs md:text-sm">No syntax errors detected.</AlertDescription>
             </Alert>
         )}
 
         {validationStatus === "error" && (
-          <Alert variant="destructive">
-              <XCircle className="h-4 w-4" />
+          <Alert variant="destructive" role="alert" aria-live="assertive">
+              <XCircle className="h-4 w-4" aria-hidden="true" />
               <AlertTitle className="text-sm md:text-base">Validation Error</AlertTitle>
               <AlertDescription className="font-code break-words text-xs md:text-sm">{validationMessage}</AlertDescription>
               <div className="mt-3">
-                <Button onClick={handleExplainError} disabled={isAIExplanationLoading} size="sm">
-                    <Wand2 className="mr-1.5 h-4 w-4" />
+                <Button 
+                  onClick={handleExplainError} 
+                  disabled={isAIExplanationLoading} 
+                  size="sm"
+                  className="min-h-[44px] md:min-h-[32px]"
+                  aria-label="Get AI explanation for this error"
+                >
+                    <Wand2 className="mr-1.5 h-4 w-4" aria-hidden="true" />
                     <span className="text-xs md:text-sm">{isAIExplanationLoading ? "Thinking..." : "Explain with AI"}</span>
                 </Button>
               </div>
@@ -339,10 +383,10 @@ export function JsonTool() {
         )}
 
         {aiExplanation && !isAIExplanationLoading && (
-          <Card className="bg-primary/5 border-primary/20">
+          <Card className="bg-primary/5 border-primary/20" role="region" aria-labelledby="ai-explanation-title">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-primary text-base md:text-lg">
-                    <Wand2 className="h-4 w-4 md:h-5 md:w-5" />
+                <CardTitle id="ai-explanation-title" className="flex items-center gap-2 text-primary text-base md:text-lg">
+                    <Wand2 className="h-4 w-4 md:h-5 md:w-5" aria-hidden="true" />
                     AI-Powered Explanation
                 </CardTitle>
               </CardHeader>
@@ -353,13 +397,18 @@ export function JsonTool() {
                 </div>
                 <div>
                     <h3 className="font-semibold text-foreground mb-2 text-sm md:text-base">Suggested Fix</h3>
-                    <div className="font-code bg-muted p-3 rounded-md break-words text-xs md:text-sm text-muted-foreground overflow-x-auto">
+                    <div className="font-code bg-muted p-3 rounded-md break-words text-xs md:text-sm text-muted-foreground overflow-x-auto scrollbar-thin">
                       <pre><code>{aiExplanation.suggestedFix}</code></pre>
                     </div>
                 </div>
                 <div className="pt-2">
-                    <Button onClick={handleApplyFix} size="sm">
-                      <Wrench className="mr-1.5 h-4 w-4" />
+                    <Button 
+                      onClick={handleApplyFix} 
+                      size="sm"
+                      className="min-h-[44px] md:min-h-[32px]"
+                      aria-label="Apply the suggested fix to your JSON"
+                    >
+                      <Wrench className="mr-1.5 h-4 w-4" aria-hidden="true" />
                       <span className="text-xs md:text-sm">Apply Fix</span>
                     </Button>
                 </div>

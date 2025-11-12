@@ -86,28 +86,43 @@ export function JsonConverter() {
       <Textarea
         readOnly
         value={convertedCode}
-        className="w-full h-full font-code text-xs md:text-sm resize-none bg-muted/20 border-0 focus-visible:ring-0"
+        className="w-full h-full font-code text-xs md:text-sm resize-none bg-muted/20 border-0 focus-visible:ring-0 scrollbar-thin"
         placeholder={`Converted ${activeTab.toUpperCase()} will appear here...`}
+        aria-label={`Converted ${activeTab.toUpperCase()} code`}
       />
     );
   };
   
   return (
-    <Card className="flex flex-col h-full border-border/40">
+    <Card className="flex flex-col h-full border-border/40" role="region" aria-labelledby="converter-title">
       <CardHeader className="pb-3 space-y-2">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-primary/10 rounded">
+              <div className="p-1.5 bg-primary/10 rounded" aria-hidden="true">
                 <FileJson className="h-3.5 w-3.5 text-primary" />
               </div>
-              <CardTitle className="text-sm font-semibold">Converter</CardTitle>
+              <CardTitle id="converter-title" className="text-sm font-semibold">Converter</CardTitle>
             </div>
-            <div className="flex gap-1">
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => handleConversion(activeTab)} disabled={isLoading || jsonContext?.validationStatus !== 'success'} title="Refresh">
-                    <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} />
+            <div className="flex gap-1" role="toolbar" aria-label="Converter actions">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="min-h-[44px] min-w-[44px] md:h-7 md:w-7" 
+                  onClick={() => handleConversion(activeTab)} 
+                  disabled={isLoading || jsonContext?.validationStatus !== 'success'} 
+                  aria-label="Refresh conversion"
+                >
+                    <RefreshCw className={`h-3 w-3 ${isLoading ? 'animate-spin' : ''}`} aria-hidden="true" />
                 </Button>
-                <Button variant="ghost" size="icon" className="h-7 w-7" onClick={handleCopyToClipboard} disabled={!convertedCode || isLoading} title="Copy">
-                    <Copy className="h-3 w-3" />
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="min-h-[44px] min-w-[44px] md:h-7 md:w-7" 
+                  onClick={handleCopyToClipboard} 
+                  disabled={!convertedCode || isLoading} 
+                  aria-label="Copy converted code to clipboard"
+                >
+                    <Copy className="h-3 w-3" aria-hidden="true" />
                 </Button>
             </div>
         </div>
@@ -119,12 +134,17 @@ export function JsonConverter() {
           onValueChange={(value) => setActiveTab(value as Format)}
           className="flex-grow flex flex-col min-h-0"
         >
-          <TabsList className="grid w-full grid-cols-3 h-8 mb-2">
-            <TabsTrigger value="yaml" className="text-xs">YAML</TabsTrigger>
-            <TabsTrigger value="xml" className="text-xs">XML</TabsTrigger>
-            <TabsTrigger value="toml" className="text-xs">TOML</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 h-9 mb-2" aria-label="Output format selection">
+            <TabsTrigger value="yaml" className="text-xs min-h-[44px] md:min-h-0">YAML</TabsTrigger>
+            <TabsTrigger value="xml" className="text-xs min-h-[44px] md:min-h-0">XML</TabsTrigger>
+            <TabsTrigger value="toml" className="text-xs min-h-[44px] md:min-h-0">TOML</TabsTrigger>
           </TabsList>
-          <div className="flex-grow rounded-md bg-muted/30 border border-border/40 data-[status=invalid]:flex data-[status=invalid]:items-center data-[status=invalid]:justify-center min-h-[200px]" data-status={jsonContext?.validationStatus !== 'success' ? 'invalid' : 'valid'}>
+          <div 
+            className="flex-grow rounded-md bg-muted/30 border border-border/40 data-[status=invalid]:flex data-[status=invalid]:items-center data-[status=invalid]:justify-center min-h-[200px] overflow-auto scrollbar-thin" 
+            data-status={jsonContext?.validationStatus !== 'success' ? 'invalid' : 'valid'}
+            role="region"
+            aria-label={`Converted ${activeTab.toUpperCase()} output`}
+          >
             {renderContent()}
           </div>
         </Tabs>

@@ -9,7 +9,7 @@
 
 🌐 **Live Demo:** [https://jsonify.cit.org.in](https://jsonify.cit.org.in)
 
-![JSONify Screenshot](public/screenshot.png)
+![JSONify Screenshot](https://i.ibb.co/hxkCXWYK/Screenshot-12-11-2025-95440-localhost.jpg)
 
 ## ✨ Features
 

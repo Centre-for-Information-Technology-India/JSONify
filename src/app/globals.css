@@ -60,6 +60,33 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
+  
+  .retro {
+    --background: 120 20% 8%; /* Dark green tint */
+    --foreground: 120 100% 85%; /* Bright green */
+    --card: 120 20% 10%;
+    --card-foreground: 120 100% 85%;
+    --popover: 120 20% 10%;
+    --popover-foreground: 120 100% 85%;
+    --primary: 120 100% 50%; /* Neon green */
+    --primary-foreground: 120 100% 10%;
+    --secondary: 120 20% 15%;
+    --secondary-foreground: 120 100% 85%;
+    --muted: 120 20% 15%;
+    --muted-foreground: 120 50% 60%;
+    --accent: 120 100% 60%;
+    --accent-foreground: 120 100% 10%;
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 120 50% 20%;
+    --input: 120 50% 20%;
+    --ring: 120 100% 50%;
+    --chart-1: 120 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 80 80% 55%;
+    --chart-4: 140 65% 60%;
+    --chart-5: 100 75% 55%;
+  }
 }
 
 @layer base {
@@ -73,9 +100,14 @@ body {
 
 @layer utilities {
   /* Improve scrollbar styling for webkit browsers */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--border)) transparent;
+  }
+  
   .scrollbar-thin::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
   }
   
   .scrollbar-thin::-webkit-scrollbar-track {
@@ -84,10 +116,12 @@ body {
   
   .scrollbar-thin::-webkit-scrollbar-thumb {
     @apply bg-border rounded-full;
+    border: 2px solid transparent;
+    background-clip: padding-box;
   }
   
   .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-    @apply bg-border/80;
+    @apply bg-primary/50;
   }
   
   /* Better mobile touch targets */
@@ -97,6 +131,17 @@ body {
       min-width: 44px;
     }
   }
+  
+  /* Enhanced focus indicators for accessibility */
+  *:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+  
+  /* Smooth scrolling */
+  html {
+    scroll-behavior: smooth;
+  }
 }
 
 /* Code editor enhancements */
@@ -105,6 +150,8 @@ textarea.font-code {
   -moz-tab-size: 2;
   line-height: 1.6;
   letter-spacing: 0.01em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 
 textarea.font-code::placeholder {
@@ -117,3 +164,5 @@ textarea.font-code {
   background-size: 100% 3.2em;
   background-position: 0 0.2em;
 }
+
+
